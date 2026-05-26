@@ -1,0 +1,12 @@
+.DS_Store
+.env
+!.env.example
+docker-compose.override.yml
+/postgres/data/
+/mosquitto/data/
+/mosquitto/log/
+/nodered/data/flows_cred.json
+/nodered/data/node_modules/
+/backend/vendor/
+/frontend/node_modules/
+/frontend/.next/
