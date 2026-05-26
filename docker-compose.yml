@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_DB: ${DB_DATABASE:-flood_alert}
       POSTGRES_USER: ${DB_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - flood_db_data:/var/lib/postgresql/data
       - ./postgres/init-scripts:/docker-entrypoint-initdb.d
