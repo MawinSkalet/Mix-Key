@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Laravel 10 Backend
 
 # --- Base Stage ---
-FROM php:8.2-fpm AS base
+FROM php:8.4-fpm AS base
 
 WORKDIR /var/www/html
 
