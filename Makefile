@@ -1,3 +1,13 @@
+ifeq ($(OS),Windows_NT)
+    # Windows Cmd settings
+    COPY_ENV = if not exist .env copy .env.example .env
+    COPY_OVERRIDE = if not exist docker-compose.override.yml copy docker-compose.override.example.yml docker-compose.override.yml
+else
+    # Linux / macOS settings
+    COPY_ENV = test -f .env || cp .env.example .env
+    COPY_OVERRIDE = test -f docker-compose.override.yml || cp docker-compose.override.example.yml docker-compose.override.yml
+endif
+
 .PHONY: help setup start stop restart update format logs shell-back shell-front shell-db clean-safe reset-db
 .DEFAULT_GOAL := help
 
@@ -5,8 +15,8 @@ help:
 	@echo "Available commands: setup, start, stop, update, format, logs, shell-back, shell-front, clean-safe, reset-db"
 
 setup:
-	@if [ ! -f .env ]; then cp .env.example .env; fi
-	@if [ ! -f docker-compose.override.yml ]; then cp docker-compose.override.example.yml docker-compose.override.yml; fi
+	@$(COPY_ENV)
+	@$(COPY_OVERRIDE)
 	@docker-compose up -d --build
 	@docker-compose exec backend composer install
 	@docker-compose exec backend php artisan key:generate
