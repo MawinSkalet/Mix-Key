@@ -1,5 +1,5 @@
 <<<<<<< HEAD
-# 🌊 Flood Monitoring & Alert System (Thailand Municipalities)
+# 🌊 Mix-key project 
 
 An IoT-based Time-series Flood Monitoring & Alert System designed for local municipalities in Thailand. This system integrates real-time telemetry from hardware sensors, Mosquitto (MQTT) broker, Node-RED transformers, a high-performance TimescaleDB database, a PHP Laravel API gateway, and a Next.js citizen/staff dashboard—all orchestrated securely via Docker.
 
