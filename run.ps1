@@ -14,6 +14,7 @@ function Show-Help {
     Write-Host "  ./run.ps1 shell-back  - Open an interactive shell inside the Laravel container"
     Write-Host "  ./run.ps1 shell-front - Open an interactive shell inside the Next.js container"
     Write-Host "  ./run.ps1 shell-db    - Connect to TimescaleDB command-line client"
+    Write-Host "  ./run.ps1 update      - Pull latest code and auto-install/build packages for dev alignment"
     Write-Host "========================================================" -ForegroundColor Cyan
 }
 
@@ -76,6 +77,22 @@ switch ($Action) {
 
     "shell-db" {
         docker compose exec db psql -U postgres -d flood_alert
+    }
+
+    "update" {
+        Write-Host "Pulling latest code from Git..." -ForegroundColor Gray
+        git pull origin main
+        
+        Write-Host "Syncing and installing Composer packages..." -ForegroundColor Gray
+        docker compose exec backend composer install
+        
+        Write-Host "Running database migrations..." -ForegroundColor Gray
+        docker compose exec backend php artisan migrate
+        
+        Write-Host "Installing/Syncing frontend npm packages..." -ForegroundColor Gray
+        docker compose exec frontend npm install
+        
+        Write-Host "`nProject packages successfully synced and updated!" -ForegroundColor Green
     }
 
     default {
