@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🌊 Flood Monitoring & Alert System (Thailand Municipalities)
 
 An IoT-based Time-series Flood Monitoring & Alert System designed for local municipalities in Thailand. This system integrates real-time telemetry from hardware sensors, Mosquitto (MQTT) broker, Node-RED transformers, a high-performance TimescaleDB database, a PHP Laravel API gateway, and a Next.js citizen/staff dashboard—all orchestrated securely via Docker.
@@ -122,3 +123,17 @@ Use these commands to easily orchestrate the environment:
 | **Next.js Shell** | `make shell-front` | `./run.ps1 shell-front` | `docker compose exec frontend sh` |
 | **Postgres Shell** | `make shell-db` | `./run.ps1 shell-db` | `docker compose exec db psql -U postgres -d flood_alert` |
 | **Git Sync & Update** | `make update` | `./run.ps1 update` | *Pulls origin, runs composer install, database migrations, and npm install* |
+=======
+HOW TO SET UP PROJECT
+1.FOLK THIS REPO
+2.OPEN IN IDE
+3.DOWNLOAD Makefiles Tools extentions ใน vscode 
+4.เปิด docker desktop
+5.เปิด terminal แล้วพิม make setup หรือ ใช้คำสั่งนี้ 
+docker-compose up -d --build
+docker-compose exec backend composer install
+docker-compose exec backend php artisan key:generate
+docker-compose exec backend php artisan migrate:fresh --seed
+docker-compose exec frontend npm install
+6.เปลี่ยน file ลบ .exam ในทุกไฟล์ แล้ว ตั้งค่า environtment
+>>>>>>> 986047a6543b5a96c1b47ba1eaec914796f69014
