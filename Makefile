@@ -1,10 +1,12 @@
 ifeq ($(OS),Windows_NT)
     # Windows Cmd settings
     COPY_ENV = if not exist .env copy .env.example .env
+    COPY_BACK_ENV = if not exist backend\.env copy backend\.env.example backend\.env
     COPY_OVERRIDE = if not exist docker-compose.override.yml copy docker-compose.override.example.yml docker-compose.override.yml
 else
     # Linux / macOS settings
     COPY_ENV = test -f .env || cp .env.example .env
+    COPY_BACK_ENV = test -f backend/.env || cp backend/.env.example backend/.env
     COPY_OVERRIDE = test -f docker-compose.override.yml || cp docker-compose.override.example.yml docker-compose.override.yml
 endif
 
@@ -16,6 +18,7 @@ help:
 
 setup:
 	@$(COPY_ENV)
+	@$(COPY_BACK_ENV)
 	@$(COPY_OVERRIDE)
 	@docker-compose up -d --build
 	@docker-compose exec backend composer install

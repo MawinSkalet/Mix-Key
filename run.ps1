@@ -30,6 +30,10 @@ switch ($Action) {
             Copy-Item .env.example .env 
             Write-Host "Created .env" -ForegroundColor Green
         }
+        if (-not (Test-Path backend\.env)) { 
+            Copy-Item backend\.env.example backend\.env 
+            Write-Host "Created backend/.env" -ForegroundColor Green
+        }
         if (-not (Test-Path docker-compose.override.yml)) { 
             Copy-Item docker-compose.override.example.yml docker-compose.override.yml 
             Write-Host "Created docker-compose.override.yml" -ForegroundColor Green
