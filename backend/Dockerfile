@@ -29,8 +29,8 @@ FROM base AS dev
 # Expose PHP built-in server port or serve on port 80
 EXPOSE 80
 
-# Keep running php artisan serve in dev
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=80"]
+# Auto-install composer dependencies if missing, then keep running php artisan serve in dev
+CMD sh -c "if [ ! -f vendor/autoload.php ]; then composer install; fi && php artisan serve --host=0.0.0.0 --port=80"
 
 # --- Production Stage ---
 FROM base AS production

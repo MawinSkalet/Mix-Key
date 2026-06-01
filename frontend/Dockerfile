@@ -16,8 +16,8 @@ EXPOSE 3000
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
-# Set dev running command
-CMD ["npm", "run", "dev"]
+# Auto-install npm dependencies if missing, then set dev running command
+CMD sh -c "if [ ! -d node_modules ]; then npm install; fi && npm run dev"
 
 # --- Production Stage ---
 FROM base AS production
