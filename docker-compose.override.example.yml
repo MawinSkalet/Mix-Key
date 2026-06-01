@@ -1,24 +1,28 @@
-version: '3.8'
+version: "3.8"
 
 services:
   db:
     ports:
-      - "127.0.0.1:5433:5432"
+      - "127.0.0.1:15433:5432"
+
+  mqtt:
+    ports:
+      - "127.0.0.1:11883:1883"
 
   nodered:
     ports:
-      - "127.0.0.1:1880:1880"
+      - "127.0.0.1:11880:1880"
     volumes:
       - ./nodered/data:/data
 
   backend:
-    build: 
+    build:
       context: ./backend
       target: dev
     volumes:
       - ./backend:/var/www/html
     ports:
-      - "127.0.0.1:8000:80"
+      - "127.0.0.1:18000:80"
 
   frontend:
     build:
@@ -27,4 +31,9 @@ services:
     volumes:
       - ./frontend:/app
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:13000:3000"
+
+  nginx:
+    ports:
+      - "127.0.0.1:18080:80"
+      - "127.0.0.1:18443:443"
