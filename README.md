@@ -52,12 +52,27 @@ Install the official **Makefile Tools** extension by Microsoft inside VS Code. T
 Open the **Docker Desktop** application and wait until the indicator in the bottom-left corner turns **Green** (indicating the engine is healthy).
 
 #### **5. Configure Local Environments**
-Make sure to set up your private configuration files from the templates:
-*   **Manually:**
-    *   Duplicate `.env.example` and rename it to `.env`
-    *   Duplicate `docker-compose.override.example.yml` and rename it to `docker-compose.override.yml`
-    *   *Customize your database password and configurations inside `.env` if desired.*
-*   **Or automatically:** Let the setup commands in the next step do this for you!
+
+ขั้นตอนนี้สำคัญที่สุด เพราะถ้าพลาด Backend จะเชื่อมต่อฐานข้อมูลไม่ได้:
+
+* **สร้างไฟล์ `.env` ของระบบหลัก:**
+  ```bash
+  cp .env.example .env
+  ```
+  *(เปิดไฟล์ `.env` แล้วตรวจสอบว่า `DB_PASSWORD` และ `MQTT_PASSWORD` ได้รับการตั้งค่าไว้เรียบร้อยแล้ว)*
+
+* **สร้างไฟล์ `.env` ของ Backend (Laravel):**
+  ```bash
+  cp backend/.env.example backend/.env
+  ```
+
+* **สร้างไฟล์ Docker Override:**
+  ```bash
+  cp docker-compose.override.example.yml docker-compose.override.yml
+  ```
+
+* **หรือให้ระบบจัดการให้อัตโนมัติ:** หากรันคำสั่ง setup ในขั้นตอนถัดไป ตัวสคริปต์เวอร์ชันปรับปรุงล่าสุดจะทำการสร้างและคัดลอกไฟล์เหล่านี้ให้โดยอัตโนมัติ!
+
 
 #### **6. Launch the Stack**
 Choose **one** of the following methods to boot up the environment and install all packages:
