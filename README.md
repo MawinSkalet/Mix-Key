@@ -137,3 +137,6 @@ docker-compose exec backend php artisan migrate:fresh --seed
 docker-compose exec frontend npm install
 6.เปลี่ยน file ลบ .exam ในทุกไฟล์ แล้ว ตั้งค่า environtment
 >>>>>>> 986047a6543b5a96c1b47ba1eaec914796f69014
+
+
+Hi
