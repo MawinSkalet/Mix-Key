@@ -22,7 +22,7 @@ services:
     container_name: flood_mqtt
     restart: unless-stopped
     ports:
-      - "1883:1883"
+      - "${MQTT_EXPOSED_PORT:-127.0.0.1:1883}:1883"
     volumes:
       - ./mosquitto/config:/mosquitto/config
       - ./mosquitto/data:/mosquitto/data
@@ -62,8 +62,8 @@ services:
     container_name: flood_nginx
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "${NGINX_EXPOSED_PORT_HTTP:-127.0.0.1:80}:80"
+      - "${NGINX_EXPOSED_PORT_HTTPS:-127.0.0.1:443}:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
     depends_on:
