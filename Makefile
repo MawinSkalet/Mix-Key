@@ -3,11 +3,15 @@ ifeq ($(OS),Windows_NT)
     COPY_ENV = if not exist .env copy .env.example .env
     COPY_BACK_ENV = if not exist backend\.env copy backend\.env.example backend\.env
     COPY_OVERRIDE = if not exist docker-compose.override.yml copy docker-compose.override.example.yml docker-compose.override.yml
+    WAIT_BACKEND = powershell -Command "while (-not (Test-Path backend\vendor\autoload.php)) { Start-Sleep -Seconds 2 }"
+    WAIT_FRONTEND = powershell -Command "while (-not (Test-Path frontend\node_modules)) { Start-Sleep -Seconds 2 }"
 else
     # Linux / macOS settings
     COPY_ENV = test -f .env || cp .env.example .env
     COPY_BACK_ENV = test -f backend/.env || cp backend/.env.example backend/.env
     COPY_OVERRIDE = test -f docker-compose.override.yml || cp docker-compose.override.example.yml docker-compose.override.yml
+    WAIT_BACKEND = until [ -f backend/vendor/autoload.php ]; do sleep 2; done
+    WAIT_FRONTEND = until [ -d frontend/node_modules ]; do sleep 2; done
 endif
 
 .PHONY: help setup start stop restart update format logs shell-back shell-front shell-db clean-safe reset-db
@@ -21,10 +25,14 @@ setup:
 	@$(COPY_BACK_ENV)
 	@$(COPY_OVERRIDE)
 	@docker-compose up -d --build
-	@docker-compose exec backend composer install
+	@echo "Waiting for backend dependencies to be installed..."
+	@$(WAIT_BACKEND)
+	@echo "Backend dependencies installed successfully!"
 	@docker-compose exec backend php artisan key:generate
 	@docker-compose exec backend php artisan migrate:fresh --seed
-	@docker-compose exec frontend npm install
+	@echo "Waiting for frontend dependencies to be installed..."
+	@$(WAIT_FRONTEND)
+	@echo "Frontend dependencies installed successfully!"
 	@echo "Setup Complete!"
 
 start:

@@ -42,13 +42,21 @@ switch ($Action) {
         Write-Host "Building and launching Docker containers..." -ForegroundColor Gray
         docker compose up -d --build
 
+        Write-Host "Waiting for backend dependencies to be installed in container (composer install)..." -ForegroundColor Gray
+        while (-not (Test-Path backend\vendor\autoload.php)) {
+            Start-Sleep -Seconds 2
+        }
+        Write-Host "Backend dependencies installed successfully!" -ForegroundColor Green
+
         Write-Host "Running Backend migrations and keys setup..." -ForegroundColor Gray
-        docker compose exec backend composer install
         docker compose exec backend php artisan key:generate
         docker compose exec backend php artisan migrate:fresh --seed
 
-        Write-Host "Installing Frontend dependencies..." -ForegroundColor Gray
-        docker compose exec frontend npm install
+        Write-Host "Waiting for frontend dependencies to be installed in container (npm install)..." -ForegroundColor Gray
+        while (-not (Test-Path frontend\node_modules)) {
+            Start-Sleep -Seconds 2
+        }
+        Write-Host "Frontend dependencies installed successfully!" -ForegroundColor Green
 
         Write-Host "`nSetup Complete!" -ForegroundColor Green
     }
