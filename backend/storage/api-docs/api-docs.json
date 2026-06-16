@@ -15,13 +15,843 @@
         "/stations": {
             "get": {
                 "tags": [
-                    "Stations"
+                    "Guest APIs"
                 ],
-                "summary": "ดึงรายชื่อสถานีทั้งหมด (Placeholder)",
-                "operationId": "82c429c9eb8569668125add2b82fc4b0",
+                "summary": "ดึงรายชื่อสถานีทั้งหมด (รองรับ GPS)",
+                "operationId": "37a43e2a59cc97060c8c67b160738f06",
+                "parameters": [
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "description": "ละติจูดของผู้ใช้ (เช่น 19.98765)",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "description": "ลองจิจูดของผู้ใช้ (เช่น 99.87654)",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "description": "รัศมีการค้นหา หน่วยกิโลเมตร (เช่น 10)",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "ดึงข้อมูลสำเร็จ"
+                    }
+                }
+            }
+        },
+        "/stations/{id}": {
+            "get": {
+                "tags": [
+                    "Guest APIs"
+                ],
+                "summary": "ดึงข้อมูลรายละเอียดสถานี",
+                "operationId": "da19240f7794d804eaf8f8a4a542e513",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "รหัสสถานี",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ดึงข้อมูลสำเร็จ"
+                    },
+                    "404": {
+                        "description": "ไม่พบข้อมูลสถานี"
+                    }
+                }
+            }
+        },
+        "/stations/{id}/water-level": {
+            "get": {
+                "tags": [
+                    "Guest APIs"
+                ],
+                "summary": "ดึงข้อมูลประวัติระดับน้ำย้อนหลัง (มี Aggregation + Pagination)",
+                "operationId": "f6df1287d54fb3381e1557cca28f5ace",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "รหัสสถานี",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "range",
+                        "in": "query",
+                        "description": "ช่วงเวลาของข้อมูล (6h, 1m, 3m, 6m)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "6h"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "หน้าข้อมูล (Pagination)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "จำนวนจุดข้อมูลต่อหน้า",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 100
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ดึงข้อมูลประวัติสำเร็จ"
+                    }
+                }
+            }
+        },
+        "/alerts/active": {
+            "get": {
+                "tags": [
+                    "Guest APIs"
+                ],
+                "summary": "ดึงข้อมูลการแจ้งเตือนภัยพายุ/ระดับน้ำวิกฤตปัจจุบันจาก TMD",
+                "operationId": "c20faec549c37507e1dc52281a7f7504",
+                "responses": {
+                    "200": {
+                        "description": "ดึงข้อมูลสำเร็จ"
+                    }
+                }
+            }
+        },
+        "/telemetry/ingest": {
+            "post": {
+                "tags": [
+                    "IoT Telemetry Ingestion"
+                ],
+                "summary": "ช่องทางรับข้อมูลดิบจาก Node-RED/Sensor",
+                "operationId": "cb3bb89a11c460312565716b8ace48ff",
+                "parameters": [
+                    {
+                        "name": "X-API-KEY",
+                        "in": "header",
+                        "description": "รหัสลับความปลอดภัยอุปกรณ์",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "sensor_id",
+                                    "water_level_cm",
+                                    "battery_voltage"
+                                ],
+                                "properties": {
+                                    "sensor_id": {
+                                        "type": "string",
+                                        "example": "PT-01"
+                                    },
+                                    "timestamp": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-06-08T16:15:00+07:00"
+                                    },
+                                    "water_level_cm": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 245
+                                    },
+                                    "battery_voltage": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 3.82
+                                    },
+                                    "signal_strength_rssi": {
+                                        "type": "integer",
+                                        "example": -72
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "บันทึกข้อมูลเรียบร้อยแล้ว"
+                    },
+                    "401": {
+                        "description": "API Key ไม่ถูกต้อง"
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "เข้าสู่ระบบสตาฟฟ์/แอดมิน เพื่อรับ Bearer Token",
+                "operationId": "3b578bde47faf5711ca9c22c8d3917ca",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "mawin.staff@maejhan.go.th"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "securepassword123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "ล็อกอินสำเร็จ"
+                    },
+                    "422": {
+                        "description": "ข้อมูลตรวจสอบไม่ผ่าน"
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "ออกจากระบบ (ทำลาย Token)",
+                "operationId": "75430f4aa001cb1457460c229448295c",
+                "responses": {
+                    "200": {
+                        "description": "ออกจากระบบสำเร็จ"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/staff/stations/{id}/telemetry": {
+            "get": {
+                "tags": [
+                    "Staff APIs"
+                ],
+                "summary": "ดึงข้อมูลสถานะการทำงานจริงของเครื่อง (สตาฟฟ์เท่านั้น)",
+                "operationId": "76155da526279cd7421c854aa2a5dd1b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "รหัสสถานี",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ดึงข้อมูลสำเร็จ"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/staff/stations/{id}/thresholds": {
+            "patch": {
+                "tags": [
+                    "Staff APIs"
+                ],
+                "summary": "ปรับเปลี่ยนเกณฑ์เตือนภัยระดับน้ำ (สตาฟฟ์เท่านั้น)",
+                "operationId": "bd6797494ed4b2f833468050a6e6cc20",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "รหัสสถานี",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "warning_datum_m": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 2.2
+                                    },
+                                    "critical_datum_m": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 3.1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "อัปเดตระดับเตือนภัยสำเร็จ"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/staff/stations/{id}/maintenance": {
+            "get": {
+                "tags": [
+                    "Staff APIs"
+                ],
+                "summary": "เรียกดูประวัติการซ่อมบำรุงของสถานี (สตาฟฟ์เท่านั้น)",
+                "operationId": "212dc3bc21211528948c83a742a1bd82",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "รหัสสถานี",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ดึงประวัติสำเร็จ"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/staff/maintenance": {
+            "post": {
+                "tags": [
+                    "Staff APIs"
+                ],
+                "summary": "บันทึกผลงานการซ่อมบำรุงและรูปภาพหลักฐาน (สตาฟฟ์เท่านั้น)",
+                "operationId": "5d393ee47946d79570076d8fd1641f89",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "station_id",
+                                    "maintenance_date",
+                                    "description",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "station_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "maintenance_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-06-08"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "ทำความสะอาดตะไคร่น้ำหัวเซนเซอร์"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "completed"
+                                    },
+                                    "image": {
+                                        "description": "ไฟล์รูป JPEG/PNG ไม่เกิน 5MB",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "บันทึกข้อมูลและอัปโหลดรูปสำเร็จ"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/staff/maintenance-requests": {
+            "post": {
+                "tags": [
+                    "Staff APIs"
+                ],
+                "summary": "ส่งคำร้องขอเบิกอุปกรณ์/แจ้งจุดซ่อมบำรุงด่วน (สตาฟฟ์เท่านั้น)",
+                "operationId": "a6fb7e524133dd81521459fff11b3758",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "station_id",
+                                    "request_type",
+                                    "item_requested",
+                                    "priority",
+                                    "reason"
+                                ],
+                                "properties": {
+                                    "station_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "request_type": {
+                                        "type": "string",
+                                        "example": "hardware"
+                                    },
+                                    "item_requested": {
+                                        "type": "string",
+                                        "example": "Ultrasonic Sensor Module"
+                                    },
+                                    "priority": {
+                                        "type": "string",
+                                        "example": "high"
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "example": "เซนเซอร์พังจากน้ำท่วมขัง"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "ส่งคำร้องสำเร็จ"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/staff/notifications": {
+            "get": {
+                "tags": [
+                    "Staff APIs"
+                ],
+                "summary": "ดึงรายการประวัติการแจ้งเตือนภัยของ Staff (สตาฟฟ์เท่านั้น)",
+                "operationId": "409130e422db20d5073126d36f5876a0",
+                "parameters": [
+                    {
+                        "name": "unread_only",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ดึงรายการแจ้งเตือนสำเร็จ"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/staff/notifications/{id}/read": {
+            "put": {
+                "tags": [
+                    "Staff APIs"
+                ],
+                "summary": "กดรับทราบ/อ่านเหตุการณ์แจ้งเตือนภัยพิบัติ (สตาฟฟ์เท่านั้น)",
+                "operationId": "e81322a389f33de8473b1383f087165c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "รหัสการแจ้งเตือนภัย",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "บันทึกการอ่านสำเร็จ"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/users": {
+            "get": {
+                "tags": [
+                    "Admin APIs"
+                ],
+                "summary": "ดึงรายการผู้ใช้ทั้งหมดในระบบ (แอดมินเท่านั้น)",
+                "operationId": "036e7c403dcf4889043bf1800d4abeb2",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ดึงรายชื่อสำเร็จ"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin APIs"
+                ],
+                "summary": "สร้างบัญชีผู้ใช้ใหม่ให้ Staff หรือ Admin โดยตรง (แอดมินเท่านั้น)",
+                "operationId": "31783e5e978e86f3b6fbcbe5342524e1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "กอฟ Database"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "golf@maejhan.go.th"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "temporaryPassword123"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "admin"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "สร้างบัญชีสำเร็จ"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/users/{id}/role": {
+            "patch": {
+                "tags": [
+                    "Admin APIs"
+                ],
+                "summary": "อัปเดตระดับสิทธิ์ผู้ใช้ (แอดมินเท่านั้น)",
+                "operationId": "35bcd0a6c8eba3ab6c05dcce3085c430",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "รหัสผู้ใช้งาน",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "role"
+                                ],
+                                "properties": {
+                                    "role": {
+                                        "type": "string",
+                                        "example": "staff"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "อัปเดตสิทธิ์สำเร็จ"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/users/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin APIs"
+                ],
+                "summary": "ลบบัญชีผู้ใช้ออกจากระบบ (แอดมินเท่านั้น)",
+                "operationId": "706980ee94c66a768bf73e752a497dd0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "รหัสผู้ใช้งาน",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ลบบัญชีสำเร็จ"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/cap/alert": {
+            "post": {
+                "tags": [
+                    "CAP Alerts Integration"
+                ],
+                "summary": "รับข้อมูลแจ้งเตือนภัยตามมาตรฐาน CAP v1.2 จาก Sri Gateway (XML / JSON)",
+                "operationId": "dbc9bd98d74245ace11cf413ab335e2f",
+                "requestBody": {
+                    "description": "CAP V1.2 XML or JSON payload representing the warning",
+                    "required": true,
+                    "content": {
+                        "application/xml": {
+                            "schema": {
+                                "type": "string",
+                                "example": "<alert>...</alert>"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "identifier",
+                                    "sender",
+                                    "sent",
+                                    "status",
+                                    "msgType",
+                                    "scope",
+                                    "info"
+                                ],
+                                "properties": {
+                                    "identifier": {
+                                        "type": "string",
+                                        "example": "sri-gateway-112233"
+                                    },
+                                    "sender": {
+                                        "type": "string",
+                                        "example": "sri-gateway@kku.ac.th"
+                                    },
+                                    "sent": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-06-16T18:00:00+07:00"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "Actual"
+                                    },
+                                    "msgType": {
+                                        "type": "string",
+                                        "example": "Alert"
+                                    },
+                                    "scope": {
+                                        "type": "string",
+                                        "example": "Public"
+                                    },
+                                    "info": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "บันทึกและนำเข้าข้อมูลแจ้งเตือนสำเร็จ"
+                    },
+                    "400": {
+                        "description": "ข้อมูลไม่ถูกต้องตามรูปแบบ CAP"
                     }
                 }
             }
@@ -39,8 +869,28 @@
     },
     "tags": [
         {
-            "name": "Stations",
-            "description": "Stations"
+            "name": "Guest APIs",
+            "description": "Guest APIs"
+        },
+        {
+            "name": "IoT Telemetry Ingestion",
+            "description": "IoT Telemetry Ingestion"
+        },
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
+            "name": "Staff APIs",
+            "description": "Staff APIs"
+        },
+        {
+            "name": "Admin APIs",
+            "description": "Admin APIs"
+        },
+        {
+            "name": "CAP Alerts Integration",
+            "description": "CAP Alerts Integration"
         }
     ]
 }

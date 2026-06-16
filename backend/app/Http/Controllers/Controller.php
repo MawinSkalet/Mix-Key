@@ -66,7 +66,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function getStations() {}
+    public function getStationsDoc() {}
 
     /**
      * @OA\Get(
@@ -90,7 +90,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function getStationById() {}
+    public function getStationByIdDoc() {}
 
     /**
      * @OA\Get(
@@ -131,7 +131,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function getWaterLevels() {}
+    public function getWaterLevelsDoc() {}
 
     /**
      * @OA\Get(
@@ -144,7 +144,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function getActiveAlerts() {}
+    public function getActiveAlertsDoc() {}
 
 
     /*
@@ -187,7 +187,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function ingestTelemetry() {}
+    public function ingestTelemetryDoc() {}
 
 
     /*
@@ -219,7 +219,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function login() {}
+    public function loginDoc() {}
 
     /**
      * @OA\Post(
@@ -233,7 +233,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function logout() {}
+    public function logoutDoc() {}
 
     /**
      * @OA\Get(
@@ -254,7 +254,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function getStaffTelemetry() {}
+    public function getStaffTelemetryDoc() {}
 
     /**
      * @OA\Patch(
@@ -282,7 +282,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function updateThresholds() {}
+    public function updateThresholdsDoc() {}
 
     /**
      * @OA\Get(
@@ -315,7 +315,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function getMaintenanceHistory() {}
+    public function getMaintenanceHistoryDoc() {}
 
     /**
      * @OA\Post(
@@ -343,7 +343,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function logMaintenance() {}
+    public function logMaintenanceDoc() {}
 
     /**
      * @OA\Post(
@@ -368,7 +368,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function createMaintenanceRequest() {}
+    public function createMaintenanceRequestDoc() {}
 
     /**
      * @OA\Get(
@@ -400,7 +400,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function getStaffNotifications() {}
+    public function getStaffNotificationsDoc() {}
 
     /**
      * @OA\Put(
@@ -421,7 +421,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function readNotification() {}
+    public function readNotificationDoc() {}
 
 
     /*
@@ -454,7 +454,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function getAdminUsers() {}
+    public function getAdminUsersDoc() {}
 
     /**
      * @OA\Post(
@@ -478,7 +478,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function createAdminUser() {}
+    public function createAdminUserDoc() {}
 
     /**
      * @OA\Patch(
@@ -506,7 +506,7 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function updateAdminUserRole() {}
+    public function updateAdminUserRoleDoc() {}
 
     /**
      * @OA\Delete(
@@ -527,5 +527,44 @@ class Controller extends BaseController
      *     )
      * )
      */
-    public function deleteAdminUser() {}
+    public function deleteAdminUserDoc() {}
+
+    /**
+     * @OA\Post(
+     *     path="/cap/alert",
+     *     summary="รับข้อมูลแจ้งเตือนภัยตามมาตรฐาน CAP v1.2 จาก Sri Gateway (XML / JSON)",
+     *     tags={"CAP Alerts Integration"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="CAP V1.2 XML or JSON payload representing the warning",
+     *         @OA\MediaType(
+     *             mediaType="application/xml",
+     *             @OA\Schema(type="string", example="<alert>...</alert>")
+     *         ),
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"identifier", "sender", "sent", "status", "msgType", "scope", "info"},
+     *                 @OA\Property(property="identifier", type="string", example="sri-gateway-112233"),
+     *                 @OA\Property(property="sender", type="string", example="sri-gateway@kku.ac.th"),
+     *                 @OA\Property(property="sent", type="string", format="date-time", example="2026-06-16T18:00:00+07:00"),
+     *                 @OA\Property(property="status", type="string", example="Actual"),
+     *                 @OA\Property(property="msgType", type="string", example="Alert"),
+     *                 @OA\Property(property="scope", type="string", example="Public"),
+     *                 @OA\Property(property="info", type="array", @OA\Items(type="object"))
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="บันทึกและนำเข้าข้อมูลแจ้งเตือนสำเร็จ"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="ข้อมูลไม่ถูกต้องตามรูปแบบ CAP"
+     *     )
+     * )
+     */
+    public function inboundAlertDoc() {}
 }
